@@ -1,0 +1,77 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Upload Release Asset
+
+jobs:
+  Windows:
+    name: Windows Binary
+    runs-on: [windows-latest]
+    steps:
+      - name: Checkout git
+        uses: actions/checkout@master
+      - name: Install Nim
+        uses: jiro4989/setup-nim-action@v1.1.4
+      - name: build win binary
+        run: |
+          nimble refresh
+          nimble build -d:release
+      - name: Store win binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: winbin
+          path: nwnt.exe
+  Linux:
+    name: Linux Binary and Release
+    needs: Windows
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: setup Nim # This would actually build your project, using zip for an example artifact
+        uses: jiro4989/setup-nim-action@v1.1.4
+      - name: Compile Project
+        run: |
+          nimble refresh
+          nimble build -d:release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Zip Linux Asset
+        run: zip nwnt-linux.zip nwnt
+      - name: Upload Linux Asset
+        id: upload-linux-asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./nwnt-linux.zip
+          asset_name: nwnt-linux.zip
+          asset_content_type: application/zip
+      - name: Retrieve Window Binary
+        uses: actions/download-artifact@v2
+        with:
+          name: winbin
+      - name: Zip Windows Asset
+        run: zip nwnt-windows.zip nwnt.exe
+      - name: Upload Windows Asset
+        id: upload-windows-asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./nwnt-windows.zip
+          asset_name: nwnt-windows.zip
+          asset_content_type: application/zip
