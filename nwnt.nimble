@@ -6,7 +6,7 @@ description   = "GFF <-> NWNT Converter (NeverWinter Nights Text)"
 license       = "MIT"
 srcDir        = "src"
 installExt    = @["nim"]
-bin           = @["NWNT"]
+bin           = @["nwnt"]
 
 
 # Dependencies
