@@ -9,13 +9,12 @@ proc manageEscapesToText(str: string): string =
 proc manageEscapesToGff(str: string): string =
   result = str.multiReplace([("\\n","\n"),("\\r","\r")])
 
-proc nwntFromGffStruct*(s: GffStruct, namePrefix: string = ""): seq[array[3, string]] =
+proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = ""): seq[array[3, string]] =
   ##Transforms the given GFFStruct into a sequence of nwnt
   if s of GffRoot:
     result.add(["data_type", "", $s.GffRoot.fileType])
 
   for lable, gffValue in pairs(s.fields):
-
     let
       name = namePrefix & lable
       kind = '$' & $gffValue.fieldKind
@@ -30,10 +29,10 @@ proc nwntFromGffStruct*(s: GffStruct, namePrefix: string = ""): seq[array[3, str
     of GffFieldKind.Short: value = $gffValue.getValue(GffShort).int
     of GffFieldKind.Dword: value = $gffValue.getValue(GffDword).int
     of GffFieldKind.Int: value = $gffValue.getValue(GffInt).int
-    of GffFieldKind.Float: value = $gffValue.getValue(GffFloat).float
+    of GffFieldKind.Float: value = $gffValue.getValue(GffFloat).float.formatFloat(ffDecimal, floatPrecision)
     of GffFieldKind.Dword64: value = $gffValue.getValue(GffDword64).int64
     of GffFieldKind.Int64: value = $gffValue.getValue(GffInt64).int64
-    of GffFieldKind.Double: value = $gffValue.getValue(GffDouble).float64
+    of GffFieldKind.Double: value = $gffValue.getValue(GffDouble).float64.formatFloat(ffDecimal, floatPrecision)
     of GffFieldKind.CExoString: value = $gffValue.getValue(GffCExoString)
     of GffFieldKind.ResRef: value = $gffValue.getValue(GffResRef).string
     of GffFieldKind.Void: value = $gffValue.getValue(GffVoid).string.encode()
@@ -50,7 +49,7 @@ proc nwntFromGffStruct*(s: GffStruct, namePrefix: string = ""): seq[array[3, str
       let struct = gffValue.getValue(GffStruct)
       result.add([name, kind, $struct.id])
       let prefix = name & '.' #Struct Prefix
-      let breakdown = nwntFromGffStruct(struct, prefix)
+      let breakdown = nwntFromGffStruct(struct, floatPrecision, prefix)
       result.add(breakdown)
       fieldHandled = true
     of GffFieldKind.List:
@@ -58,15 +57,15 @@ proc nwntFromGffStruct*(s: GffStruct, namePrefix: string = ""): seq[array[3, str
         let nameIndex = name & "[]"
         result.add([nameIndex, kind, $elem.id])
         let prefix = nameIndex & "." #List Prefix
-        let breakdown = nwntFromGffStruct(elem, prefix)
+        let breakdown = nwntFromGffStruct(elem, floatPrecision, prefix)
         result.add(breakdown)
       fieldHandled = true
 
     if fieldHandled == false: result.add([name, kind, value])
 
-proc toNwnt*(file: FileStream, s: GffStruct) =
+proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4) =
   ##Passes GFFStruct to receive seq of nwnt, then processes for lines
-  let nwnt = nwntFromGffStruct(s)
+  let nwnt = nwntFromGffStruct(s, floatPrecision)
 
   for line in nwnt:
     file.write(line[0] & line[1] & " = " & manageEscapesToText(line[2]) & "\c\L")

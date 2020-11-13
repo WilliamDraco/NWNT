@@ -1,0 +1,6 @@
+# V1.1.0
+- implement float precision limit (default to 4)
+- cleanup of invoking parameters
+
+# V1.0.0
+- Initial release

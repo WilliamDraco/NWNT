@@ -2,7 +2,7 @@
 # uses this file as the main entry point of the application.
 
 import nwnt_lib/gffnwnt
-import os, streams, docopt
+import os, streams, docopt, strutils
 import neverwinter/gff
 
 const GffExtensions* = @[
@@ -18,17 +18,17 @@ when isMainModule:
   Supports input of either .nwnt or .gff data, and outputs the other.
 
   Usage:
-    nwnt <inputfile> [-o outputfile]
+    nwnt <inputfile> [options]
     nwnt -h | --help
     nwnt --version
 
   Options:
-    -i        path to the input file (with extension)
+    -o FILE     optional path to the output file (without extension)
+                Will default to input directory
 
-    -o FILE   optional path to the output file (without extension)
-              Will default to input directory
+    -p places   float precision for nwnt output [default: 4]
 
-    -h         Show this screen
+    -h          Show this screen
   """
 
   let inputfile = $args["<inputfile>"]
@@ -42,10 +42,11 @@ when isMainModule:
   if informat in GffExtensions:
     outputfile.add(".nwnt")
 
+    let floatPrecision = parseInt($args["-p"])
     let input  = openFileStream(inputfile)
     let output = openFileStream(outputfile, fmWrite)
     state = input.readGffRoot(false)
-    output.toNwnt(state)
+    output.toNwnt(state, floatPrecision)
 
   elif informat == "nwnt":
     if(outputfile[^5..^1] == ".nwnt"):
