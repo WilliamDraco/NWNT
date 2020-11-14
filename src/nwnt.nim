@@ -2,6 +2,7 @@
 # uses this file as the main entry point of the application.
 
 import nwntpkg/gffnwnt
+export gffnwnt
 import os, streams, docopt, strutils
 import neverwinter/gff
 
