@@ -1,6 +1,6 @@
 # custom grep language NeverWinterNightsText (nwnt) support for gff reading/writing
 
-import tables, strutils, streams, parseutils, base64
+import tables, strutils, streams, parseutils, base64, algorithm, sequtils
 import neverwinter/gff, neverwinter/util, neverwinter/languages
 
 proc manageEscapesToText(str: string): string =
@@ -9,12 +9,18 @@ proc manageEscapesToText(str: string): string =
 proc manageEscapesToGff(str: string): string =
   result = str.multiReplace([("\\n","\n"),("\\r","\r")])
 
+iterator sortedPairs(s: GffStruct): tuple[key: string, value: GffField] =
+  let fields = toSeq(s.fields.pairs).sorted
+  for key, value in fields.items:
+    yield (key, value)
+
+
 proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = ""): seq[array[3, string]] =
   ##Transforms the given GFFStruct into a sequence of nwnt
   if s of GffRoot:
     result.add(["data_type", "", $s.GffRoot.fileType])
 
-  for lable, gffValue in pairs(s.fields):
+  for lable, gffValue in s.sortedPairs:
     let
       name = namePrefix & lable
       kind = '$' & $gffValue.fieldKind
