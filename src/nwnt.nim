@@ -3,7 +3,7 @@
 
 import nwntpkg/gffnwnt
 export gffnwnt
-import os, streams, docopt, strutils
+import os, streams, docopt, strutils, parsecfg
 import neverwinter/gff
 
 const GffExtensions* = @[
@@ -31,6 +31,21 @@ when isMainModule:
 
     -h          Show this screen
   """
+
+  #Adapted from nwsync --version handling
+  if args["--version"]:
+    const nimble: string   = slurp(currentSourcePath().splitFile().dir & "/../nwnt.nimble")
+    const gitBranch: string = staticExec("git symbolic-ref -q --short HEAD").strip
+    const gitRev: string    = staticExec("git rev-parse HEAD").strip
+
+    let nimbleConfig        = loadConfig(newStringStream(nimble))
+    let packageVersion     = nimbleConfig.getSectionValue("", "version")
+    let versionString  = "NWNT " & packageVersion & " (" & gitBranch & "/" & gitRev[0..5] & ", nim " & NimVersion & ")"
+
+    echo versionString
+    quit(0)
+
+
 
   let inputfile = $args["<inputfile>"]
   let informat = inputfile.splitFile.ext[1..^1]
