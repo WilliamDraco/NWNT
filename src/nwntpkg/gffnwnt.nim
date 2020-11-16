@@ -3,6 +3,8 @@
 import tables, strutils, streams, parseutils, base64, algorithm, sequtils
 import neverwinter/gff, neverwinter/util, neverwinter/languages
 
+####### Helper Procs #######
+
 proc manageEscapesToText(str: string): string =
   result = str.multiReplace([("\n","\\n"),("\r","\\r")])
 
@@ -14,6 +16,7 @@ iterator sortedPairs(s: GffStruct): tuple[key: string, value: GffField] =
   for key, value in fields.items:
     yield (key, value)
 
+####### Actual-work Procs #######
 
 proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = ""): seq[array[3, string]] =
   ##Transforms the given GFFStruct into a sequence of nwnt
@@ -84,22 +87,30 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
     if not file.readLine(line):
       return
 
-    let
-      valSplit = line.split('=', 1)
-      value = valSplit[1][1..^1]
-      nameKindSplit = valSplit[0].split('$', 1)
+    var
+      name, kind, lable, value: string
+
+    try:
+      let
+        valSplit = line.split('=', 1)
+        nameKindSplit = valSplit[0].split('$', 1)
       name = nameKindSplit[0]
-      prefixLableSplit = name.rsplit('.')
 
-    if prefixLableSplit.len-1 != listDepth:
-      setPosition(file, pos)
-      return
+      let prefixLableSplit = name.rsplit('.')
+      if prefixLableSplit.len-1 != listDepth:
+        setPosition(file, pos)
+        return
 
-    let
-      lableandIndex = prefixLableSplit[listDepth][0..^1]
-      lable = lableandIndex.rsplit('[', 1)[0]
+      let lableandIndex = prefixLableSplit[listDepth]
+
       kind = toLowerAscii(nameKindSplit[1][0..^2])
+      lable = lableandIndex.rsplit('[', 1)[0]
+      value = valSplit[1][1..^1]
+    except:
+      raise newException(ValueError, "Syntax error parsing: " & line)
 
+    if lable.len > 16:
+      raise newException(ValueError, "Syntax error near: " & line)
 
     case kind:
     of "byte": result[lable, GffByte] = parseInt(value).GffByte
@@ -130,8 +141,7 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
         let subSplit = line.split('=', 1)
         let indexSplit = subSplit[0].rsplit('[', 1)
 
-        if indexSplit.len == 1 or
-        indexSplit[0] != name:
+        if indexSplit[0] != name:
           setPosition(file, pos)
           break
 
@@ -162,11 +172,10 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
         if not file.readLine(line):
           break
 
-        let listTest = line.split('$', 1)
-        let indexSplit = listTest[0].rsplit('[', 1)
-
-        if indexSplit.len == 1 or
-        indexSplit[0] != name[0..^3]:
+        let listTest = line.split('$', 1)[0]
+        if  listTest != name:
+          if listTest.split(']').len > name.split(']').len:
+            raise newException(ValueError, "Syntax error near: " & line)
           setPosition(file, pos)
           break
 
