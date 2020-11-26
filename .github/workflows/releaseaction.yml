@@ -23,7 +23,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: winbin
-          path: nwnt.exe
+          path: nwn_nwnt.exe
   Linux:
     name: Linux Binary and Release
     needs: Windows
@@ -48,7 +48,7 @@ jobs:
           draft: true
           prerelease: false
       - name: Zip Linux Asset
-        run: zip nwnt-linux.zip nwnt
+        run: zip nwnt-linux.zip nwn_nwnt
       - name: Upload Linux Asset
         id: upload-linux-asset
         uses: actions/upload-release-asset@v1.0.2
@@ -64,7 +64,7 @@ jobs:
         with:
           name: winbin
       - name: Zip Windows Asset
-        run: zip nwnt-windows.zip nwnt.exe
+        run: zip nwnt-windows.zip nwn_nwnt.exe
       - name: Upload Windows Asset
         id: upload-windows-asset
         uses: actions/upload-release-asset@v1.0.2

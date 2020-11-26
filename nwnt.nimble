@@ -1,12 +1,12 @@
 # Package
 
-version       = "1.2.1"
-author        = "WilliamDraco"
-description   = "GFF <-> NWNT Converter (NeverWinter Nights Text)"
-license       = "MIT"
-srcDir        = "src"
-installExt    = @["nim"]
-bin           = @["nwnt"]
+version          = "1.2.2"
+author           = "WilliamDraco"
+description      = "GFF <-> NWNT Converter (NeverWinter Nights Text)"
+license          = "MIT"
+srcDir           = "src"
+installExt       = @["nim"]
+namedBin["nwnt"] = "nwn_nwnt"
 
 
 # Dependencies

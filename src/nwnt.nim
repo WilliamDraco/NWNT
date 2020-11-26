@@ -16,7 +16,7 @@ when isMainModule:
   let args = docopt"""
   Convert gff data to the custom output language 'nwnt'.
 
-  Supports input of either .nwnt or .gff data, and outputs the other.
+  Supports input of either nwnt or gff data, and outputs the other.
 
   Usage:
     nwnt <inputfile> [options]
@@ -74,4 +74,4 @@ when isMainModule:
     output.write(state)
 
   else:
-    quit("This is not a supported format")
+    quit(informat & " is not a supported format")

@@ -1,3 +1,6 @@
+# V1.2.2
+- change binary name to nwn_nwnt for consistency with nim tools
+
 # V1.2.1
 - Syntax error handling over nwnt parsing
 - implement '--version' arg
