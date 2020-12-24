@@ -64,7 +64,7 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
     of GffFieldKind.List:
       if (gffValue.getValue(GffList)).len == 0:
         let nameIndex = name & "[]"
-        result.add([nameIndex, kind, " "])
+        result.add([nameIndex, kind, "_"])
       for elem in gffValue.getValue(GffList):
         let nameIndex = name & "[]"
         result.add([nameIndex, kind, $elem.id])
@@ -162,7 +162,7 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
       result[lable, GffStruct] = st
     of "list":
       var list = newGffList()
-      if value != " ": #empty list skips parsing
+      if value != "_": #empty list skips parsing
         var listStructID = parseInt(value).int32
 
         while(true):
