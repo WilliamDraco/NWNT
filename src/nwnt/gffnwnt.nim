@@ -62,6 +62,9 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
       result.add(breakdown)
       fieldHandled = true
     of GffFieldKind.List:
+      if (gffValue.getValue(GffList)).len == 0:
+        let nameIndex = name & "[]"
+        result.add([nameIndex, kind, " "])
       for elem in gffValue.getValue(GffList):
         let nameIndex = name & "[]"
         result.add([nameIndex, kind, $elem.id])
@@ -158,32 +161,32 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
       gffStructFromNwnt(file, st, listDepth+1)
       result[lable, GffStruct] = st
     of "list":
-      var
-        list = newGffList()
-        listStructID = parseInt(value).int32
+      var list = newGffList()
+      if value != " ": #empty list skips parsing
+        var listStructID = parseInt(value).int32
 
-      while(true):
-        let st = newGffStruct()
-        st.id = listStructID
-        gffStructFromNwnt(file, st, listDepth+1)
-        list.add(st)
+        while(true):
+          let st = newGffStruct()
+          st.id = listStructID
+          gffStructFromNwnt(file, st, listDepth+1)
+          list.add(st)
 
-        pos = getPosition(file)
-        if not file.readLine(line):
-          break
+          pos = getPosition(file)
+          if not file.readLine(line):
+            break
 
-        let listTest = line.split('$', 1)[0]
-        if  listTest != name:
-          if listTest.split(']').len > name.split(']').len:
-            raise newException(ValueError, "Syntax error near: " & line)
-          setPosition(file, pos)
-          break
+          let listTest = line.split('$', 1)[0]
+          if  listTest != name:
+            if listTest.split(']').len > name.split(']').len:
+              raise newException(ValueError, "Syntax error near: " & line)
+            setPosition(file, pos)
+            break
 
-        let
-          newListIDSplit = line.split('=', 1)
-          newListID = newListIDSplit[1][1..^1]
+          let
+            newListIDSplit = line.split('=', 1)
+            newListID = newListIDSplit[1][1..^1]
 
-        listStructID = parseInt(newListID).int32
+          listStructID = parseInt(newListID).int32
 
       result[lable, GffList] = list
     else: raise newException(ValueError, "unknown field type " & kind)

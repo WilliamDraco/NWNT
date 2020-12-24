@@ -1,7 +1,7 @@
 # This is just an example to get you started. A typical hybrid package
 # uses this file as the main entry point of the application.
 
-import nwntpkg/gffnwnt
+import nwnt/gffnwnt
 export gffnwnt
 import os, streams, docopt, strutils, parsecfg
 import neverwinter/gff
@@ -19,9 +19,9 @@ when isMainModule:
   Supports input of either nwnt or gff data, and outputs the other.
 
   Usage:
-    nwnt <inputfile> [options]
-    nwnt -h | --help
-    nwnt --version
+    nwn_nwnt <inputfile> [options]
+    nwn_nwnt -h | --help
+    nwn_nwnt --version
 
   Options:
     -o FILE     optional path to the output file (without extension)

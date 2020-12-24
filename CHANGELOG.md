@@ -1,3 +1,6 @@
+# v1.3.0
+- Change to write/read empty GffLists as some unexpected behaviour when ignored.
+
 # V1.2.2
 - change binary name to nwn_nwnt for consistency with nim tools
 
