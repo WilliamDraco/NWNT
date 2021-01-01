@@ -1,0 +1,14 @@
+data_type = JRL
+Categories[]$List = 0
+Categories[].Comment$CExoString =
+Categories[].EntryList[]$List = 0
+Categories[].EntryList[].End$Word = 0
+Categories[].EntryList[].ID$Dword = 1
+Categories[].EntryList[].Text$CExoLocString = -1
+Categories[].EntryList[].Text[0] = <CUSTOM10001>
+Categories[].Name$CExoLocString = -1
+Categories[].Name[0] = Persistant Journal Entry
+Categories[].Picture$Word = 65535
+Categories[].Priority$Dword = 0
+Categories[].Tag$CExoString = PersistantPartyJournal
+Categories[].XP$Dword = 0
