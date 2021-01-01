@@ -21,7 +21,7 @@ iterator sortedPairs(s: GffStruct): tuple[key: string, value: GffField] =
 proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = ""): seq[array[3, string]] =
   ##Transforms the given GFFStruct into a sequence of nwnt
   if s of GffRoot:
-    result.add(["data_type", "", $s.GffRoot.fileType])
+    result.add(["data_type", "", ($s.GffRoot.fileType).strip()])
 
   for lable, gffValue in s.sortedPairs:
     let
@@ -80,7 +80,8 @@ proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4) =
   let nwnt = nwntFromGffStruct(s, floatPrecision)
 
   for line in nwnt:
-    file.write(line[0] & line[1] & " = " & manageEscapesToText(line[2]) & "\c\L")
+    let gap = if line[2].len > 0: " " else: ""
+    file.write(line[0] & line[1] & " =" & gap & manageEscapesToText(line[2]) & "\c\L")
 
 proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0) =
   var line: string
@@ -108,7 +109,10 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
 
       kind = toLowerAscii(nameKindSplit[1][0..^2])
       lable = lableandIndex.rsplit('[', 1)[0]
-      value = valSplit[1][1..^1]
+      if valSplit[1].len == 0:
+        value = ""
+      else:
+        value = valSplit[1][1..^1]
     except:
       raise newException(ValueError, "Syntax error parsing: " & line)
 
@@ -194,8 +198,10 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
 proc gffRootFromNwnt*(file: FileStream): GffRoot =
   ## Attempts to read a GffRoot from nwnt file. Will raise ValueError on any issues.
   result = newGffRoot()
-  let dataType = readline(file).split('=', 1)
+  var dataType = readline(file).split('=', 1)
   expect(dataType[0] == "data_type ")
-  result.fileType = dataType[1][1..3] & ' '
+  while dataType[1].len < 5:
+    dataType[1] = dataType[1] & ' '
+  result.fileType = dataType[1][1..4]
 
   file.gffStructFromNwnt(result)

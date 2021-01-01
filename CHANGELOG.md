@@ -1,3 +1,7 @@
+# v1.3.1
+- Improve EOL handling of whitespace (in and out of nwnt) for nul-values (Sorry for large diffs as a result. Make sure all contributors are either before or after this version to prevent flip-flopping on the diffs)
+- handle gff formats with varying magic-byte datatype lengths (future proofing, don't think any exist but 'just in case')
+
 # v1.3.0
 - Change to write/read empty GffLists as some unexpected behaviour when ignored.
 
