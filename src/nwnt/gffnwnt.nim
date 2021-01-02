@@ -153,7 +153,7 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
           break
 
         let
-          subValue = subSplit[1][1..^1]
+          subValue = if subSplit[1].len == 0: "" else: subSplit[1][1..^1]
           subLable = indexSplit[1][0..^3]
 
         exo.entries[parseInt(subLable)] = manageEscapesToGff(subValue)
@@ -188,7 +188,7 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
 
           let
             newListIDSplit = line.split('=', 1)
-            newListID = newListIDSplit[1][1..^1]
+            newListID = if newListIDSplit[1].len == 0: "" else: newListIDSplit[1][1..^1]
 
           listStructID = parseInt(newListID).int32
 
