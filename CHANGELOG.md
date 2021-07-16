@@ -1,3 +1,6 @@
+# v1.3.3
+- Correct 'Bearing' sign flipping due to floating point math when Bearing == 180 degrees (Pi/-Pi Radians)
+
 # v1.3.2
 - Bugfix in the 1.3.2 EOL whitespace handling
 

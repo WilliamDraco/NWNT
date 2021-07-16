@@ -23,6 +23,8 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
   if s of GffRoot:
     result.add(["data_type", "", ($s.GffRoot.fileType).strip()])
 
+  let piCheck = formatFloat(-3.141592653589793, ffDecimal, floatPrecision)
+
   for lable, gffValue in s.sortedPairs:
     let
       name = namePrefix & lable
@@ -38,7 +40,9 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
     of GffFieldKind.Short: value = $gffValue.getValue(GffShort).int
     of GffFieldKind.Dword: value = $gffValue.getValue(GffDword).int
     of GffFieldKind.Int: value = $gffValue.getValue(GffInt).int
-    of GffFieldKind.Float: value = $gffValue.getValue(GffFloat).float.formatFloat(ffDecimal, floatPrecision)
+    of GffFieldKind.Float:
+      value = gffValue.getValue(GffFloat).float.formatFloat(ffDecimal, floatPrecision)
+      if lable == "Bearing" and value == piCheck: value = value[1..^1]
     of GffFieldKind.Dword64: value = $gffValue.getValue(GffDword64).int64
     of GffFieldKind.Int64: value = $gffValue.getValue(GffInt64).int64
     of GffFieldKind.Double: value = $gffValue.getValue(GffDouble).float64.formatFloat(ffDecimal, floatPrecision)
