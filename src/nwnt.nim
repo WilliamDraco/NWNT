@@ -24,10 +24,13 @@ when isMainModule:
     nwn_nwnt --version
 
   Options:
-    -o FILE     optional path to the output file (without extension)
+    -o FILE     Optional path to the output file (without extension)
                 Will default to input directory
 
-    -p places   float precision for nwnt output [default: 4]
+    -p places   Float precision for nwnt output [default: 4]
+
+    -i indent   Indents each text 'level' n number of spaces, creating cascading and foldable output. [default: 0]
+                (Gff->NWNT only. NWNT->Gff will work regardless of indents in the source)
 
     -h          Show this screen
   """
@@ -59,10 +62,11 @@ when isMainModule:
     outputfile.add(".nwnt")
 
     let floatPrecision = parseInt($args["-p"])
+    let indentSpaces = parseInt($args["-i"])
     let input  = openFileStream(inputfile)
     let output = openFileStream(outputfile, fmWrite)
     state = input.readGffRoot(false)
-    output.toNwnt(state, floatPrecision)
+    output.toNwnt(state, floatPrecision, indentSpaces)
 
   elif informat == "nwnt":
     if(outputfile[^5..^1] == ".nwnt"):

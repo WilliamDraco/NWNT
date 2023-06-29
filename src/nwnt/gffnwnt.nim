@@ -1,6 +1,6 @@
 # custom grep language NeverWinterNightsText (nwnt) support for gff reading/writing
 
-import tables, strutils, streams, parseutils, base64, algorithm, sequtils
+import tables, strutils, streams, parseutils, base64, algorithm, sequtils, std/strbasics
 import neverwinter/gff, neverwinter/util, neverwinter/languages
 
 ####### Helper Procs #######
@@ -79,13 +79,15 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
 
     if fieldHandled == false: result.add([name, kind, value])
 
-proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4) =
+proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4, indentSpaces: int = 0) =
   ##Passes GFFStruct to receive seq of nwnt, then processes for lines
   let nwnt = nwntFromGffStruct(s, floatPrecision)
 
   for line in nwnt:
     let gap = if line[2].len > 0: " " else: ""
-    file.write(line[0] & line[1] & " =" & gap & manageEscapesToText(line[2]) & "\c\L")
+    var indent = ""
+    if indentSpaces > 0: indent = repeat(" ", line[0].count('.') * indentSpaces)
+    file.write(indent & line[0] & line[1] & " =" & gap & manageEscapesToText(line[2]) & "\c\L")
 
 proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0) =
   var line: string
@@ -94,6 +96,8 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
     pos = getPosition(file)
     if not file.readLine(line):
       return
+
+    line.strip(true,false)
 
     var
       name, kind, lable, value: string
@@ -149,6 +153,8 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
         if not file.readLine(line):
           break
 
+        line.strip(true,false)
+
         let subSplit = line.split('=', 1)
         let indexSplit = subSplit[0].rsplit('[', 1)
 
@@ -182,6 +188,8 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
           pos = getPosition(file)
           if not file.readLine(line):
             break
+
+          line.strip(true,false)
 
           let listTest = line.split('$', 1)[0]
           if  listTest != name:

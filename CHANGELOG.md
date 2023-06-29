@@ -1,3 +1,7 @@
+# v1.4.0
+- Implement optional arguement for indenting each 'level', making the resultant nwnt cascade neatly and fold in most editors by default.
+- Validity of the above approach is ongoing argument ;)
+
 # v1.3.3
 - Correct 'Bearing' sign flipping due to floating point math when Bearing == 180 degrees (Pi/-Pi Radians)
 
