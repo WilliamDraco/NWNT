@@ -1,6 +1,6 @@
 # Package
 
-version          = "1.3.3"
+version          = "1.4.0"
 author           = "WilliamDraco"
 description      = "GFF <-> NWNT Converter (NeverWinter Nights Text)"
 license          = "MIT"
