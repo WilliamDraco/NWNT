@@ -1,3 +1,6 @@
+# v1.4.1
+- add 'Orientation' nodes to the anti-sign-flipping on 180 degrees due to floating point math.
+
 # v1.4.0
 - Implement optional arguement for indenting each 'level', making the resultant nwnt cascade neatly and fold in most editors by default.
 - Validity of the above approach is ongoing argument ;)

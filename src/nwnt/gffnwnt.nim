@@ -42,7 +42,7 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
     of GffFieldKind.Int: value = $gffValue.getValue(GffInt).int
     of GffFieldKind.Float:
       value = gffValue.getValue(GffFloat).float.formatFloat(ffDecimal, floatPrecision)
-      if lable == "Bearing" and value == piCheck: value = value[1..^1]
+      if lable in @["Bearing", "Orientation"] and value == piCheck: value = value[1..^1]
     of GffFieldKind.Dword64: value = $gffValue.getValue(GffDword64).int64
     of GffFieldKind.Int64: value = $gffValue.getValue(GffInt64).int64
     of GffFieldKind.Double: value = $gffValue.getValue(GffDouble).float64.formatFloat(ffDecimal, floatPrecision)
