@@ -1,3 +1,6 @@
+# v1.5.1 (beta)
+- stdin changed. Now, either no inputfile OR `-` will pull from stdin. Invalid file paths will error
+
 # v1.5.0 (beta)
 - Now accepts stdin (assumed if inputfile is not a valid file)
 - Now can produce stdout (if using stdin and no -o specified, or by specifying '-o stdout')
