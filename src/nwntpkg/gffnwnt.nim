@@ -79,7 +79,7 @@ proc nwntFromGffStruct*(s: GffStruct, floatPrecision: int, namePrefix: string = 
 
     if fieldHandled == false: result.add([name, kind, value])
 
-proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4, indentSpaces: int = 0) =
+proc toNwnt*(file: Stream, s: GffStruct, floatPrecision: int = 4, indentSpaces: int = 0) =
   ##Passes GFFStruct to receive seq of nwnt, then processes for lines
   let nwnt = nwntFromGffStruct(s, floatPrecision)
 
@@ -89,7 +89,7 @@ proc toNwnt*(file: FileStream, s: GffStruct, floatPrecision: int = 4, indentSpac
     if indentSpaces > 0: indent = repeat(" ", line[0].count('.') * indentSpaces)
     file.write(indent & line[0] & line[1] & " =" & gap & manageEscapesToText(line[2]) & "\c\L")
 
-proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0) =
+proc gffStructFromNwnt*(file: Stream, result: GffStruct, listDepth: int = 0) =
   var line: string
   var pos: int
   while(true):
@@ -207,7 +207,7 @@ proc gffStructFromNwnt*(file: FileStream, result: GffStruct, listDepth: int = 0)
       result[lable, GffList] = list
     else: raise newException(ValueError, "unknown field type " & kind)
 
-proc gffRootFromNwnt*(file: FileStream): GffRoot =
+proc gffRootFromNwnt*(file: Stream): GffRoot =
   ## Attempts to read a GffRoot from nwnt file. Will raise ValueError on any issues.
   result = newGffRoot()
   var dataType = readline(file).split('=', 1)

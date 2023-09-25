@@ -1,3 +1,9 @@
+# v1.5.0 (beta)
+- Now accepts stdin (assumed if inputfile is not a valid file)
+- Now can produce stdout (if using stdin and no -o specified, or by specifying '-o stdout')
+- Neither is ABI/CLI breaking.
+- Not 'release' as upstream issue causes gff stdout issues I can't test around.
+
 # v1.4.1
 - add 'Orientation' nodes to the anti-sign-flipping on 180 degrees due to floating point math.
 
